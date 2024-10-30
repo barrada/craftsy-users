@@ -23,16 +23,16 @@ async function findUser(username, password) {
 }
 
 // Function to create a new user
-async function createUser(name, password, phone) {
+async function createUser(firstName, lastName, phone, country, password) {
   const hashedPassword = await bcrypt.hash(password, 10);
   return new Promise((resolve, reject) => {
     db.execute(
-      'INSERT INTO users (name, password, phone) VALUES (?, ?, ?)',
-      [username, hashedPassword, phone],
+      'INSERT INTO users (first_name, last_name, phone, country, password) VALUES (?, ?, ?, ?, ?)',
+      [firstName, lastName, phone, country, hashedPassword],
       (err, results) => {
         if (err) {
           if (err.code === 'ER_DUP_ENTRY' && err.sqlMessage.includes('phone')) {
-            return reject(new Error('phone already exists'));
+            return reject(new Error('Phone number already exists'));
           }
           return reject(err);
         }
@@ -41,5 +41,6 @@ async function createUser(name, password, phone) {
     );
   });
 }
+
 
 module.exports = { findUser, createUser };

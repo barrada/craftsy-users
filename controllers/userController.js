@@ -22,31 +22,32 @@ const authenticateUser = async (req, res) => {
   res.json({ token });
 };
 
+// Protected Route
+const protectedRoute = (req, res) => {
+  // Implementation for the protected route
+  res.status(200).json({ message: 'This is a protected route' });
+};
+
 // Registration handler
+
 const registerUser = async (req, res) => {
-  const { name, password, phone } = req.body;
+  const { name, password, phone, countryData } = req.body;
 
   try {
-    // Check if user already exists
-    const existingUser = await findUser(phone, password);
-    if (existingUser) {
-      return res.status(400).send('User already exists');
-    }
+    // Split full name into first and last name
+    const [firstName, lastName] = name.trim().split(' ');
 
-    const userId = await createUser(name, password, phone, country);
+    // Get country name from countryData
+    const { name: country } = countryData;
+
+    // Create new user
+    const userId = await createUser(firstName, lastName, phone, country, password);
+
     res.status(201).json({ id: userId, message: 'User registered successfully' });
   } catch (err) {
-    if (err.message === 'phone already exists') {
-      return res.status(400).send('phone already exists');
-    }
     console.error('Error registering user:', err);
     res.status(500).send('Internal server error');
   }
-};
-
-// Protected route handler
-const protectedRoute = (req, res) => {
-  res.send(`Hello ${req.user.username}, you have access to this protected route!`);
 };
 
 //
