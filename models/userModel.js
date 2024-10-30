@@ -21,7 +21,16 @@ async function findUser(username, password) {
     });
   });
 }
-
+// check phone exists
+async function checkPhoneExists(phone) {
+  return new Promise((resolve, reject) => {
+    db.execute('SELECT COUNT(*) AS count FROM users WHERE phone = ?', [phone], (err, results) => {
+      if (err) return reject(err);
+      const count = results[0].count;
+      resolve(count > 0);
+    });
+  });
+}
 // Function to create a new user
 async function createUser(firstName, lastName, phone, country, password) {
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -43,4 +52,4 @@ async function createUser(firstName, lastName, phone, country, password) {
 }
 
 
-module.exports = { findUser, createUser };
+module.exports = { findUser, createUser, checkPhoneExists };
