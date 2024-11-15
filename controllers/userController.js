@@ -1,6 +1,8 @@
 // controllers/userController.js
 const jwt = require('jsonwebtoken');
 const { findUser, createUser } = require('../models/userModel');
+const axios = require('axios');
+
 
 // Function to generate a JWT token
 function generateToken(user) {
@@ -32,24 +34,22 @@ const protectedRoute = (req, res) => {
 
 const registerUser = async (req, res) => {
   const { name, password, phone, countryData } = req.body;
-
   try {
-    // Split full name into first and last name
     const [firstName, lastName] = name.trim().split(' ');
 
-    // Get country name from countryData
-    const { name: country } = countryData;
+    if (!countryData || !countryData.name) {
+      return res.status(400).json({ error: 'Invalid country data' });
+    }
 
-    // Create new user
-    const userId = await createUser(firstName, lastName, phone, country, password);
-
+    const userId = await createUser(firstName, lastName, phone, countryData, password);
     res.status(201).json({ id: userId, message: 'User registered successfully' });
   } catch (err) {
     console.error('Error registering user:', err);
-    res.status(500).send('Internal server error');
+    if (err.message === 'Phone number already exists') {
+      return res.status(409).json({ error: err.message });
+    }
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
-
-//
 
 module.exports = { authenticateUser, protectedRoute, registerUser };

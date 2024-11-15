@@ -8,6 +8,8 @@ const router = express.Router();
 // Routes
 router.post('/auth', authenticateUser);
 router.post('/register', registerUser); 
+
+// Protected Routes
 router.get('/protected', authenticateToken, protectedRoute);
 
 // New route to check if phone number exists
