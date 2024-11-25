@@ -35,12 +35,15 @@ const protectedRoute = (req, res) => {
 const registerUser = async (req, res) => {
   const { name, password, phone, countryData } = req.body;
   try {
-    const [firstName, lastName] = name.trim().split(' ');
 
-    if (!countryData || !countryData.name) {
+      if (!countryData || !countryData.name) {
       return res.status(400).json({ error: 'Invalid country data' });
     }
-
+        // Split the name into firstName and lastName
+        const names = name.trim().split(' ');
+        const firstName = names[0];
+        const lastName = names.slice(1).join(' ');
+        
     const userId = await createUser(firstName, lastName, phone, countryData, password);
     res.status(201).json({ id: userId, message: 'User registered successfully' });
   } catch (err) {
